@@ -5,7 +5,7 @@ on:
 
 env:
   RESOURCE_GROUP: 2T-app-RG
-  LOCATION: centralindia
+  LOCATION: southeastasia
   VNET_NAME: twoTierVnet
   VNET_CIDR: 10.1.0.0/16
   WEBSUBNET_NAME: websubnet
@@ -14,7 +14,7 @@ env:
   DBSUBNET_CIDR: 10.1.2.0/24
   WEBVM_NAME: webVM
   DBVM_NAME: dbVM
-  ADMIN_USER: azureuser
+  ADMIN_USER: vmadmin
 
 jobs:
   deploy:
