@@ -36,6 +36,7 @@ jobs:
 
   Vnet:
     runs-on: ubuntu-latest
+    needs: deploy
 
     steps:      
       - name: Create VNet and Subnets
@@ -57,7 +58,7 @@ jobs:
 
   VMs:
     runs-on: ubuntu-latest
-
+    needs: Vnet
     steps:    
       - name: Create Web VM
         run: |
@@ -71,6 +72,7 @@ jobs:
             --subnet $WEBSUBNET_NAME \
             --vnet-name $VNET_NAME \
             --public-ip-sku Standard
+          az vm open-port -g $RESOURCE_GROUP -n $WEBVM_NAME --port 80
 
       - name: Create DB VM
         run: |
@@ -125,7 +127,7 @@ jobs:
           source: "hotel.php"
           target: "/home/${{ env.ADMIN_USER }}/"
 
-      - name: Move hotel.php to Apache folder
+      - name: Move hotel.php to /var/www/html folder
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ env.WEB_IP }}
@@ -133,7 +135,7 @@ jobs:
           password: ${{ secrets.ADMIN_PASSWORD }}
           script: |
             sudo mv /home/${{ env.ADMIN_USER }}/hotel.php /var/www/html/
-            sudo systemctl restart apache2 || true
+            sudo systemctl restart nginx || true
 
       - name: Upload dbvm.sh
         uses: appleboy/scp-action@v0.1.7
