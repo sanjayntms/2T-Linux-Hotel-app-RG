@@ -31,10 +31,12 @@ jobs:
 
       - name: Create Resource Group
         run: |
+          az group show -n $RESOURCE_GROUP >/dev/null 2>&1 || \
           az group create -n $RESOURCE_GROUP -l $LOCATION
 
       - name: Create VNet and Subnets
         run: |
+          az network vnet show -g $RESOURCE_GROUP -n $VNET_NAME >/dev/null 2>&1 || \
           az network vnet create \
             -g $RESOURCE_GROUP \
             -n $VNET_NAME \
@@ -42,6 +44,7 @@ jobs:
             --subnet-name $WEBSUBNET_NAME \
             --subnet-prefix $WEBSUBNET_CIDR
 
+          az network vnet subnet show -g $RESOURCE_GROUP --vnet-name $VNET_NAME -n $DBSUBNET_NAME >/dev/null 2>&1 || \
           az network vnet subnet create \
             -g $RESOURCE_GROUP \
             --vnet-name $VNET_NAME \
@@ -50,6 +53,7 @@ jobs:
 
       - name: Create Web VM
         run: |
+          az vm show -g $RESOURCE_GROUP -n $WEBVM_NAME >/dev/null 2>&1 || \
           az vm create \
             -g $RESOURCE_GROUP \
             -n $WEBVM_NAME \
@@ -62,6 +66,7 @@ jobs:
 
       - name: Create DB VM
         run: |
+          az vm show -g $RESOURCE_GROUP -n $DBVM_NAME >/dev/null 2>&1 || \
           az vm create \
             -g $RESOURCE_GROUP \
             -n $DBVM_NAME \
