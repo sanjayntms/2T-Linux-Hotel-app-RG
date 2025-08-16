@@ -74,7 +74,7 @@ jobs:
           az vm create \
             -g $RESOURCE_GROUP \
             -n $WEBVM_NAME \
-            --image "canonical:ubuntu-20_04-lts:server:latest" \
+            --image "canonical:ubuntu-22_04-lts:server:latest" \
             --admin-username $ADMIN_USER \
             --admin-password "${{ secrets.ADMIN_PASSWORD }}" \
             --subnet $WEBSUBNET_NAME \
@@ -96,7 +96,7 @@ jobs:
           az vm create \
             -g $RESOURCE_GROUP \
             -n $DBVM_NAME \
-            --image "canonical:ubuntu-24_04-lts:server:latest" \
+            --image "canonical:ubuntu-22_04-lts:server:latest" \
             --admin-username $ADMIN_USER \
             --admin-password "${{ secrets.ADMIN_PASSWORD }}" \
             --subnet $DBSUBNET_NAME \
