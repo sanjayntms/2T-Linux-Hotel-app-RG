@@ -1,6 +1,6 @@
 #!/bin/bash
 # webvm.sh - Setup Nginx + PHP on Web VM
-# Check php version if not working and then check /etc/nginx/sites-available/default
+# Check php version if site is not working and then check /etc/nginx/sites-available/default. It changes on different version of Ubuntu.
 set -e
 
 # Install Nginx and PHP
@@ -28,7 +28,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
     }
 
     location ~ /\.ht {
