@@ -60,7 +60,7 @@ jobs:
             -n $DBSUBNET_NAME \
             --address-prefixes $DBSUBNET_CIDR
 
-  VMs:
+  webVM:
     runs-on: ubuntu-latest
     needs: Vnet
     steps:    
@@ -82,6 +82,14 @@ jobs:
             --public-ip-sku Standard
           az vm open-port -g $RESOURCE_GROUP -n $WEBVM_NAME --port 80
 
+  dbVM:
+    runs-on: ubuntu-latest
+    needs: Vnet
+    steps:    
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}     
       - name: Create DB VM
         run: |
           az vm show -g $RESOURCE_GROUP -n $DBVM_NAME >/dev/null 2>&1 || \
@@ -109,7 +117,7 @@ jobs:
 
   Deploy_Web:
     runs-on: ubuntu-latest
-    needs: VMs     
+    needs: webVM     
     steps:  
       - name: Azure Login
         uses: azure/login@v2
@@ -155,7 +163,7 @@ jobs:
 
   Deploy_DB:
     runs-on: ubuntu-latest
-    needs: VMs     
+    needs: dbVM     
     steps:     
       - name: Azure Login
         uses: azure/login@v2
