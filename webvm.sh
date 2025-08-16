@@ -1,6 +1,6 @@
 #!/bin/bash
 # webvm.sh - Setup Nginx + PHP on Web VM
-
+# Check php version if not working and then check /etc/nginx/sites-available/default
 set -e
 
 # Install Nginx and PHP
