@@ -1,0 +1,142 @@
+name: Deploy Two-Tier Azure App
+
+on:
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: 2T-app-RG
+  LOCATION: centralindia
+  VNET_NAME: twoTierVnet
+  VNET_CIDR: 10.1.0.0/16
+  WEBSUBNET_NAME: websubnet
+  WEBSUBNET_CIDR: 10.1.1.0/24
+  DBSUBNET_NAME: dbsubnet
+  DBSUBNET_CIDR: 10.1.2.0/24
+  WEBVM_NAME: webVM
+  DBVM_NAME: dbVM
+  ADMIN_USER: azureuser
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create Resource Group
+        run: |
+          az group create -n $RESOURCE_GROUP -l $LOCATION
+
+      - name: Create VNet and Subnets
+        run: |
+          az network vnet create \
+            -g $RESOURCE_GROUP \
+            -n $VNET_NAME \
+            --address-prefix $VNET_CIDR \
+            --subnet-name $WEBSUBNET_NAME \
+            --subnet-prefix $WEBSUBNET_CIDR
+
+          az network vnet subnet create \
+            -g $RESOURCE_GROUP \
+            --vnet-name $VNET_NAME \
+            -n $DBSUBNET_NAME \
+            --address-prefixes $DBSUBNET_CIDR
+
+      - name: Create Web VM
+        run: |
+          az vm create \
+            -g $RESOURCE_GROUP \
+            -n $WEBVM_NAME \
+            --image "canonical:ubuntu-24_04-lts:server:latest" \
+            --admin-username $ADMIN_USER \
+            --admin-password "${{ secrets.ADMIN_PASSWORD }}" \
+            --subnet $WEBSUBNET_NAME \
+            --vnet-name $VNET_NAME \
+            --public-ip-sku Standard
+
+      - name: Create DB VM
+        run: |
+          az vm create \
+            -g $RESOURCE_GROUP \
+            -n $DBVM_NAME \
+            --image "canonical:ubuntu-24_04-lts:server:latest" \
+            --admin-username $ADMIN_USER \
+            --admin-password "${{ secrets.ADMIN_PASSWORD }}" \
+            --subnet $DBSUBNET_NAME \
+            --vnet-name $VNET_NAME \
+            --public-ip-sku Standard
+
+      - name: Get WebVM IP
+        id: webip
+        run: |
+          ip=$(az vm show -d -g $RESOURCE_GROUP -n $WEBVM_NAME --query publicIps -o tsv)
+          echo "WEB_IP=$ip" >> $GITHUB_ENV
+
+      - name: Get DBVM IP
+        id: dbip
+        run: |
+          ip=$(az vm show -d -g $RESOURCE_GROUP -n $DBVM_NAME --query publicIps -o tsv)
+          echo "DB_IP=$ip" >> $GITHUB_ENV
+
+      - name: Upload webvm.sh
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.WEB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          source: "webvm.sh"
+          target: "/home/${{ env.ADMIN_USER }}/"
+
+      - name: Run webvm.sh on WebVM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.WEB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          script: |
+            chmod +x ~/webvm.sh
+            ./webvm.sh
+
+      - name: Copy hotel.php to WebVM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.WEB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          source: "hotel.php"
+          target: "/home/${{ env.ADMIN_USER }}/"
+
+      - name: Move hotel.php to Apache folder
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.WEB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          script: |
+            sudo mv /home/${{ env.ADMIN_USER }}/hotel.php /var/www/html/
+            sudo systemctl restart apache2 || true
+
+      - name: Upload dbvm.sh
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.DB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          source: "dbvm.sh"
+          target: "/home/${{ env.ADMIN_USER }}/"
+
+      - name: Run dbvm.sh on DBVM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DB_IP }}
+          username: ${{ env.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASSWORD }}
+          script: |
+            chmod +x ~/dbvm.sh
+            ./dbvm.sh
