@@ -17,7 +17,7 @@ env:
   ADMIN_USER: vmadmin
 
 jobs:
-  deploy:
+  Create_RG:
     runs-on: ubuntu-latest
 
     steps:
