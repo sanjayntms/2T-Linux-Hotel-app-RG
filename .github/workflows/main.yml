@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  RESOURCE_GROUP: 2T-app-RG
+  RESOURCE_GROUP: 2T-app-RG1
   LOCATION: southeastasia
   VNET_NAME: twoTierVnet
   VNET_CIDR: 10.1.0.0/16
