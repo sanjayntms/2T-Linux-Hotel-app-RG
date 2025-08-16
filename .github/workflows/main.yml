@@ -123,6 +123,8 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Checkout repo
+        uses: actions/checkout@v4
       - name: Get WebVM IP
         id: webip
         run: |
@@ -175,6 +177,8 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Checkout repo
+        uses: actions/checkout@v4
       - name: Get DBVM IP
         id: dbip
         run: |
