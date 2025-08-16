@@ -123,6 +123,12 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Get WebVM IP
+        id: webip
+        run: |
+          ip=$(az vm show -d -g $RESOURCE_GROUP -n $WEBVM_NAME --query publicIps -o tsv)
+          echo "WEB_IP=$ip" >> $GITHUB_ENV
+
       - name: Upload webvm.sh
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -169,6 +175,11 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Get DBVM IP
+        id: dbip
+        run: |
+          ip=$(az vm show -d -g $RESOURCE_GROUP -n $DBVM_NAME --query publicIps -o tsv)
+          echo "DB_IP=$ip" >> $GITHUB_ENV
       - name: Upload dbvm.sh
         uses: appleboy/scp-action@v0.1.7
         with:
