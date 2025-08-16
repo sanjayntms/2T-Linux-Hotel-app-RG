@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$host = "192.168.1.23";
+$host = "10.1.2.4";
 $user = "sampleuser";
 $pass = "SamplePass123!";
 $dbname = "sampledb";
@@ -160,3 +160,4 @@ options: { scales: { y: { beginAtZero:true } } }
 </script>
 </body>
 </html>
+
