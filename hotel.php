@@ -82,7 +82,7 @@ if (!empty($_GET['search'])) {
 </head>
 <body class="bg-dark text-white">
 <div class="container py-4">
-    <h1 class="mb-3 text-center">🏨 Hotel Check-In / Check-Out</h1>
+    <h1 class="mb-3 text-center">🏨 NTMS Sample App : Hotel Check-In / Check-Out</h1>
     
     <form method="post" class="card p-3 mb-3">
         <div class="row mb-2">
@@ -189,4 +189,5 @@ new Chart(ctx, {
 </script>
 </body>
 </html>
+
 
