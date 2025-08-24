@@ -1,4 +1,4 @@
-name: Deploy Two-Tier Azure App
+name: Deploy Linux-Two-Tier Azure App
 
 on:
   workflow_dispatch:
