@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 env:
-  RESOURCE_GROUP: 2T-app-RG1
-  LOCATION: southeastasia
+  RESOURCE_GROUP: Linux-2T-app-RG1
+  LOCATION: centralIndia
   VNET_NAME: twoTierVnet
   VNET_CIDR: 10.1.0.0/16
   WEBSUBNET_NAME: websubnet
