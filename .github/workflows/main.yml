@@ -5,7 +5,7 @@ on:
 
 env:
   RESOURCE_GROUP: Linux-2T-app-RG1
-  LOCATION: centralIndia
+  LOCATION: NorthEurope
   VNET_NAME: twoTierVnet
   VNET_CIDR: 10.1.0.0/16
   WEBSUBNET_NAME: websubnet
